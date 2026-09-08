@@ -16,6 +16,31 @@ flowchart LR
     Client -->|Bearer JWT| Catalog
 ```
 
+## Implemented Services
+
+### Identity Server
+
+The Java 21 Spring Boot service provides:
+
+- User registration and login
+- Password reset and password changes
+- User profiles and address management
+- Stateless JWT authentication with Spring Security
+- BCrypt password hashing
+- MongoDB persistence through Spring Data MongoDB
+
+### Catalog Service
+
+The Node.js and Express service provides:
+
+- Product, category, and brand management
+- Product reviews and user wishlists
+- Filtering, pagination, slugs, and activation state
+- JWT and role-based authorization through Passport-JWT
+- MongoDB persistence through Mongoose
+
+Both services are independently runnable and use a shared MongoDB data model. The Identity Server issues seven-day HS256 JWTs; Catalog verifies the shared `JWT_SECRET` and uses the roles `ROLE ADMIN`, `ROLE MEMBER`, and `ROLE MERCHANT`.
+
 ## Repositories
 
 | Repository | Responsibility | Technology or focus |
@@ -47,11 +72,15 @@ flowchart TB
 
 Current reusable workflows provide:
 
-- Node.js build and test automation
-- Java compile, test, package, and artifact publishing
-- Runtime-version inputs
-- npm and Maven dependency caching
-- Thin service-level caller workflows
+- Node.js 20 setup, npm caching, `npm ci`, tests, and optional builds
+- Java 21 Temurin setup, Maven caching, compilation, tests, packaging, and JAR artifacts
+- Configurable runtime-version inputs and test execution
+- Thin service-level caller workflows triggered by pushes and pull requests
+
+The services also use focused automated testing:
+
+- Catalog: Jest, Supertest, and MongoDB Memory Server
+- Identity: JUnit, Spring Boot Test, Spring Security Test, and JaCoCo
 
 ## Platform Roadmap
 
@@ -68,4 +97,4 @@ Planned capabilities include:
 - Staging and production environments
 - Approval-based promotion, health checks, and rollback
 
-See the [core-cloud-platform README](https://github.com/ppmcad16a-cloud-platform/core-cloud-platform#readme) for reusable workflow standards and the [workspace architecture documentation](https://github.com/ppmcad16a-cloud-platform/core-cloud-platform#readme) for the detailed platform design.
+See the [core-cloud-platform README](https://github.com/ppmcad16a-cloud-platform/core-cloud-platform#readme) for reusable workflow standards and implementation details.

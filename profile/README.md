@@ -1,109 +1,56 @@
-# MERN E-Commerce Cloud Platform
+# MERN Multi-Cloud Platform
 
-A polyglot e-commerce platform organized as independently deployable services with shared authentication, MongoDB persistence, and centralized CI/CD workflows.
-
-## Architecture
-
-```mermaid
-flowchart LR
-    Client[Client application\nReact] --> Gateway[API gateway\nNode.js]
-    Gateway --> Identity[Identity Service\nJava 21 + Spring Boot]
-    Gateway --> Catalog[Catalog Service\nNode.js + Express]
-    Gateway --> Commerce[Commerce Service\nPython + GraphQL]
-    Gateway --> Notification[Notification Service\nNode.js + Socket.IO]
-    Commerce -->|order e-mail| Notification
-    Identity --> Mongo[(MongoDB Atlas)]
-    Catalog --> Mongo
-    Commerce --> Mongo
-    Notification --> Mongo
-    Identity -->|Issues JWT| Client
-```
-
-## Implemented Services
-
-### Identity Server
-
-The Java 21 Spring Boot service provides:
-
-- User registration and login
-- Password reset and password changes
-- User profiles and address management
-- Stateless JWT authentication with Spring Security
-- BCrypt password hashing
-- MongoDB persistence through Spring Data MongoDB
-
-### Catalog Service
-
-The Node.js and Express service provides:
-
-- Product, category, and brand management
-- Product reviews and user wishlists
-- Filtering, pagination, slugs, and activation state
-- JWT and role-based authorization through Passport-JWT
-- MongoDB persistence through Mongoose
-
-Both services are independently runnable and use a shared MongoDB data model. The Identity Server issues seven-day HS256 JWTs; Catalog verifies the shared `JWT_SECRET` and uses the roles `ROLE ADMIN`, `ROLE MEMBER`, and `ROLE MERCHANT`.
-
-## Repositories
-
-| Repository | Responsibility | Technology or focus |
-|---|---|---|
-| [client-service](https://github.com/ppmcad16a-cloud-platform/client-service) | Client application | Frontend boundary |
-| [api-gateway-service](https://github.com/ppmcad16a-cloud-platform/api-gateway-service) | API gateway | External routing boundary |
-| [identity-service](https://github.com/ppmcad16a-cloud-platform/identity-service) | Authentication, users, addresses | Java 21, Spring Boot, Spring Security, MongoDB |
-| [catalog-service](https://github.com/ppmcad16a-cloud-platform/catalog-service) | Products, categories, brands, reviews, wishlists | Node.js, Express, Mongoose, MongoDB |
-| [commerce-service](https://github.com/ppmcad16a-cloud-platform/commerce-service) | Cart and orders (GraphQL) | Python 3.12, Flask, Graphene, PyMongo |
-| [notification-service](https://github.com/ppmcad16a-cloud-platform/notification-service) | Contact form, order e-mails, support chat | Node.js, Express, Socket.IO |
-| [seed-db-service](https://github.com/ppmcad16a-cloud-platform/seed-db-service) | Database initialization | One-off Node.js job |
-| [core-cloud-platform](https://github.com/ppmcad16a-cloud-platform/core-cloud-platform) | Shared CI/CD workflows + learning guides | Reusable GitHub Actions |
-| [terraform-modules](https://github.com/ppmcad16a-cloud-platform/terraform-modules) | Reusable infrastructure modules | Terraform |
-| [aws-platform](https://github.com/ppmcad16a-cloud-platform/aws-platform) | AWS infrastructure (EKS, ECR, Secrets Manager) | Terraform |
-| [azure-platform](https://github.com/ppmcad16a-cloud-platform/azure-platform) | Azure infrastructure (AKS, ACR, Key Vault) | Terraform |
-| [gcp-platform](https://github.com/ppmcad16a-cloud-platform/gcp-platform) | Google Cloud infrastructure (GKE, Artifact Registry, Secret Manager) | Terraform |
-| [global-platform](https://github.com/ppmcad16a-cloud-platform/global-platform) | Cloudflare DNS / load balancing, MongoDB Atlas access | Terraform |
-| [platform-deployments](https://github.com/ppmcad16a-cloud-platform/platform-deployments) | Helm chart, cluster add-ons, Jenkins pipelines | Helm, Jenkins |
-| [security-platform](https://github.com/ppmcad16a-cloud-platform/security-platform) | Secret stores, network policies, least-privilege docs | Kubernetes, IAM |
-| [observability-platform](https://github.com/ppmcad16a-cloud-platform/observability-platform) | Metrics, logs, dashboards, alerts, cost | Prometheus, Grafana, Loki |
-
-## Reusable CI/CD
-
-The [`core-cloud-platform`](https://github.com/ppmcad16a-cloud-platform/core-cloud-platform) repository centralizes reusable GitHub Actions workflows. Application repositories provide their own triggers and call the shared workflows with service-specific inputs.
+A polyglot MERN e-commerce shop, split into six microservices, running on **Google Cloud (GKE), Microsoft Azure (AKS) and Amazon Web Services (EKS)** behind one Cloudflare front door. Everything is created with Terraform, released through keyless GitHub Actions and Jenkins, monitored with Prometheus, Grafana and Loki, backed up to all three clouds, and switched on and off with one Ansible command.
 
 ```mermaid
 flowchart TB
-    NodeSvc[gateway, catalog, notification,\nclient, seed-db] -->|workflow_call @v1| Node[node-app.yaml]
-    Identity[identity-service] -->|workflow_call @v1| Java[java-app.yaml]
-    Commerce[commerce-service] -->|workflow_call @v1| Py[python-app.yaml]
-    Node & Java & Py -->|optional| Docker[docker-build.yaml\nbuild + Trivy gate]
-    NodeSvc & Identity & Commerce --> Sec[security-scan.yaml\ngitleaks]
+    U[Shoppers] --> CF[Cloudflare<br/>TLS · load balancer · failover gcp → azure → aws]
+    CF --> G[GCP · GKE · primary]
+    CF -.-> A[Azure · AKS · stopped standby]
+    CF -.-> W[AWS · EKS · standby at 0 nodes]
+    G & A & W --> DB[(MongoDB Atlas)]
+    DB -.encrypted backups.-> B[GCS · Azure Blob · S3]
 ```
 
-Current reusable workflows provide:
+**Start here:** the [project handbook](https://github.com/ppmcad16a-cloud-platform/core-cloud-platform/blob/main/docs/README.md) — architecture, setup guide, operations runbook, test report.
 
-- Node.js 22, Java 21 (single `mvn verify`) and Python 3.12 build + test, with each repo's coverage gate
-- Container image build with a Trivy vulnerability gate (fixable HIGH/CRITICAL fail the build)
-- Secret scanning of the full git history with gitleaks
-- Every action pinned to a commit SHA, least-privilege `permissions`, scanners checksum-verified
-- Thin service-level callers that reference the tested `@v1` release tag
+## Repositories
 
-The services also use focused automated testing:
+### Application services
 
-- Catalog: Jest, Supertest, and MongoDB Memory Server
-- Identity: JUnit, Spring Boot Test, Spring Security Test, and JaCoCo
+| Repository | Responsibility | Technology |
+|---|---|---|
+| [client-service](https://github.com/ppmcad16a-cloud-platform/client-service) | web shop, accounts, merchant/admin dashboards, support chat | React, Redux, nginx |
+| [api-gateway-service](https://github.com/ppmcad16a-cloud-platform/api-gateway-service) | single API entry point, deep health check for the load balancer | Node.js, Express |
+| [identity-service](https://github.com/ppmcad16a-cloud-platform/identity-service) | authentication, users, addresses; issues JWTs | Java 21, Spring Boot 4 |
+| [catalog-service](https://github.com/ppmcad16a-cloud-platform/catalog-service) | products, categories, brands, reviews, wishlists | Node.js, Express, Mongoose |
+| [commerce-service](https://github.com/ppmcad16a-cloud-platform/commerce-service) | cart, orders, merchants (GraphQL) | Python 3.12, Flask, Graphene |
+| [notification-service](https://github.com/ppmcad16a-cloud-platform/notification-service) | contact form, order e-mails, live support chat | Node.js, Socket.IO |
+| [seed-db-service](https://github.com/ppmcad16a-cloud-platform/seed-db-service) | one-off job: admin user + sample catalogue | Node.js |
 
-## Platform Roadmap
+### Platform
 
-The platform is being extended toward a multi-cloud delivery model covering AWS, Microsoft Azure, and Google Cloud, with Kubernetes as the common runtime.
+| Repository | Responsibility |
+|---|---|
+| [core-cloud-platform](https://github.com/ppmcad16a-cloud-platform/core-cloud-platform) | reusable CI workflows (test, scan, push to 3 registries, deploy trigger) + project handbook |
+| [gcp-platform](https://github.com/ppmcad16a-cloud-platform/gcp-platform) | Terraform: GKE (primary), Jenkins, central Grafana, Artifact Registry, Secret Manager, backups |
+| [azure-platform](https://github.com/ppmcad16a-cloud-platform/azure-platform) | Terraform: AKS (standby), ACR, Key Vault, backups |
+| [aws-platform](https://github.com/ppmcad16a-cloud-platform/aws-platform) | Terraform: EKS (standby), ECR, SSM Parameter Store, backups |
+| [global-platform](https://github.com/ppmcad16a-cloud-platform/global-platform) | Terraform: Cloudflare DNS/load balancer/Access/failover Worker, Atlas users and allow-list, shared secrets |
+| [platform-deployments](https://github.com/ppmcad16a-cloud-platform/platform-deployments) | Helm chart, Jenkins pipelines (deploy, backup, restore drill), local Docker Compose |
+| [observability-platform](https://github.com/ppmcad16a-cloud-platform/observability-platform) | versioned alert rules, recording rules and Grafana dashboards |
+| [platform-automation](https://github.com/ppmcad16a-cloud-platform/platform-automation) | Ansible: session start/stop, standby sleep/wake, break-glass deploy, DR and failover drills |
 
-Planned capabilities include:
+## How the repositories depend on each other
 
-- Docker image builds and registry publishing
-- Terraform provisioning and remote state
-- Kubernetes deployment workflows
-- Source, dependency, IaC, secret, and container scanning
-- Observability dashboards, metrics, logs, traces, and alerts
-- Cloud secret-manager integration through OIDC
-- Staging and production environments
-- Approval-based promotion, health checks, and rollback
-
-See the [core-cloud-platform README](https://github.com/ppmcad16a-cloud-platform/core-cloud-platform#readme) for reusable workflow standards and implementation details.
+```mermaid
+flowchart LR
+    SVC[7 service repos] -->|CI @v2| CORE[core-cloud-platform]
+    CORE -->|push images| REG[ECR · ACR · Artifact Registry<br/>cloud repos' foundation]
+    CORE -->|trigger| JK[Jenkins in GKE]
+    JK -->|pipelines + Helm chart| PD[platform-deployments]
+    AUTO[platform-automation] -->|terraform apply/destroy| CLOUD[gcp- / azure- / aws-platform]
+    AUTO --> GLOBAL[global-platform]
+    CLOUD -->|module ?ref=v1.1.0| OBS[observability-platform]
+    GLOBAL -->|reads cluster IPs| CLOUD
+```

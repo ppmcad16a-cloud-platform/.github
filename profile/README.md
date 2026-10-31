@@ -1,22 +1,22 @@
 # Multi-Cloud MERN Platform
 
-**HeroVired DevOps Capstone · Problem Statement #5: Multi-Cloud Deployment and Management with Terraform**
+**HeroVired DevOps Capstone Â· Problem Statement #5: Multi-Cloud Deployment and Management with Terraform**
 
 A polyglot MERN e-commerce shop, split into six microservices, running on **Google Cloud (GKE), Microsoft Azure (AKS) and Amazon Web Services (EKS)** behind one Cloudflare front door. Everything is created with Terraform, released through keyless GitHub Actions and Jenkins, monitored with Prometheus, Grafana and Loki, backed up to all three clouds, and switched on and off with one Ansible command.
 
 ```mermaid
 flowchart TB
-    U[Shoppers] --> CF[Cloudflare<br/>TLS · load balancer · failover gcp → azure → aws]
-    CF --> G[GCP · GKE · primary]
-    CF -.-> A[Azure · AKS · stopped standby]
-    CF -.-> W[AWS · EKS · standby at 0 nodes]
+    U[Shoppers] --> CF[Cloudflare<br/>TLS Â· load balancer Â· failover gcp â†’ azure â†’ aws]
+    CF --> G[GCP Â· GKE Â· primary]
+    CF -.-> A[Azure Â· AKS Â· stopped standby]
+    CF -.-> W[AWS Â· EKS Â· standby at 0 nodes]
     G & A & W --> DB[(MongoDB Atlas)]
-    DB -.encrypted backups.-> B[GCS · Azure Blob · S3]
+    DB -.encrypted backups.-> B[GCS Â· Azure Blob Â· S3]
 ```
 
-**📘 Start here: the [project handbook](https://github.com/ppmcad16a-cloud-platform/core-cloud-platform/blob/main/docs/README.md)** — architecture, security, setup guide, operations runbook, CI/CD, monitoring and cost, disaster recovery, test report, troubleshooting.
+**ðŸ“˜ Start here: the [project handbook](https://github.com/ppmcad16a-cloud-platform/core-cloud-platform/blob/main/docs/README.md)** â€” architecture, security, setup guide, operations runbook, CI/CD, monitoring and cost, disaster recovery, test report, troubleshooting.
 
-**Downloads:** [Project report (Word)](https://github.com/ppmcad16a-cloud-platform/core-cloud-platform/raw/main/docs/deliverables/Project-Report.docx) · [Presentation (PowerPoint)](https://github.com/ppmcad16a-cloud-platform/core-cloud-platform/raw/main/docs/deliverables/Presentation.pptx)
+**Downloads:** [Project report (PDF)](https://github.com/ppmcad16a-cloud-platform/core-cloud-platform/raw/main/docs/deliverables/Multi-Cloud-MERN-Platform-Report.pdf) Â· [Presentation (PowerPoint)](https://github.com/ppmcad16a-cloud-platform/core-cloud-platform/raw/main/docs/deliverables/Multi-Cloud-MERN-Platform-Presentation.pptx)
 
 ## Repositories
 
@@ -50,7 +50,7 @@ Each repository's README explains its purpose, usage and dependencies.
 ```mermaid
 flowchart LR
     SVC[7 service repos] -->|CI @v2| CORE[core-cloud-platform]
-    CORE -->|push images| REG[ECR · ACR · Artifact Registry]
+    CORE -->|push images| REG[ECR Â· ACR Â· Artifact Registry]
     CORE -->|trigger| JK[Jenkins in GKE]
     JK -->|pipelines + Helm chart| PD[platform-deployments]
     AUTO[platform-automation] -->|terraform apply/destroy| CLOUD[gcp- / azure- / aws-platform]
@@ -61,9 +61,9 @@ flowchart LR
 
 ## Where to start
 
-| I want to… | Open |
+| I want toâ€¦ | Open |
 |---|---|
-| understand the project | [handbook overview](https://github.com/ppmcad16a-cloud-platform/core-cloud-platform/blob/main/docs/README.md), or the [Word report](https://github.com/ppmcad16a-cloud-platform/core-cloud-platform/raw/main/docs/deliverables/Project-Report.docx) |
+| understand the project | [handbook overview](https://github.com/ppmcad16a-cloud-platform/core-cloud-platform/blob/main/docs/README.md), or the [PDF report](https://github.com/ppmcad16a-cloud-platform/core-cloud-platform/raw/main/docs/deliverables/Multi-Cloud-MERN-Platform-Report.pdf) |
 | run the shop on my laptop | [below](#run-the-shop-on-your-laptop-command-line), or [platform-deployments/local](https://github.com/ppmcad16a-cloud-platform/platform-deployments/blob/main/local/README.md) |
 | rebuild the platform in my own cloud accounts | [setup guide](https://github.com/ppmcad16a-cloud-platform/core-cloud-platform/blob/main/docs/04-setup-guide.md) |
 | see the automation (start, sleep, failover, teardown) | [below](#see-the-automation-one-full-session-in-the-three-clouds) |
@@ -72,7 +72,7 @@ flowchart LR
 
 ## Run the shop on your laptop (command line)
 
-Runs all six services and a private MongoDB with Docker Compose — free, no cloud account needed. Requires Git, Docker Desktop and JDK 21. Commands are for **PowerShell**.
+Runs all six services and a private MongoDB with Docker Compose â€” free, no cloud account needed. Requires Git, Docker Desktop and JDK 21. Commands are for **PowerShell**.
 
 ```powershell
 mkdir mern; cd mern
@@ -102,13 +102,13 @@ Open **http://localhost:8080** and log in with `SEED_ADMIN_EMAIL` / `SEED_ADMIN_
 
 ## See the automation: one full session in the three clouds
 
-The whole multi-cloud platform is operated with **five Ansible commands**. Every Terraform change inside them is guarded (plan → check the type of every change → apply exactly that plan), and no cloud key is stored anywhere.
+The whole multi-cloud platform is operated with **five Ansible commands**. Every Terraform change inside them is guarded (plan â†’ check the type of every change â†’ apply exactly that plan), and no cloud key is stored anywhere.
 
 ```mermaid
 flowchart LR
     L[log in + keys] --> UP[up.yml<br/>3 clusters in parallel<br/>~25-40 min]
     UP --> SB[standby.yml<br/>Azure + AWS asleep]
-    SB --> DF[drill-failover.yml<br/>GCP forced down →<br/>standbys wake by themselves]
+    SB --> DF[drill-failover.yml<br/>GCP forced down â†’<br/>standbys wake by themselves]
     DF --> DN[down.yml<br/>everything billed per hour deleted]
 ```
 
@@ -151,21 +151,21 @@ aws sts get-caller-identity --profile HeroviredProfile
 
 ### 3. Get the Cloudflare and MongoDB Atlas keys (first time, then keep them in a password manager)
 
-**Cloudflare API token** — dashboard → *My Profile* → **API Tokens** → *Create Token* → *Create Custom Token*:
+**Cloudflare API token** â€” dashboard â†’ *My Profile* â†’ **API Tokens** â†’ *Create Token* â†’ *Create Custom Token*:
 
 | Scope | Permission |
 |---|---|
-| Zone (your domain) | DNS: Edit · Zone Settings: Edit · SSL and Certificates: Edit · Load Balancers: Edit |
-| Account | Load Balancing: Monitors and Pools: Edit · Access: Apps and Policies: Edit · Access: Service Tokens: Edit · Workers Scripts: Edit · Notifications: Edit |
+| Zone (your domain) | DNS: Edit Â· Zone Settings: Edit Â· SSL and Certificates: Edit Â· Load Balancers: Edit |
+| Account | Load Balancing: Monitors and Pools: Edit Â· Access: Apps and Policies: Edit Â· Access: Service Tokens: Edit Â· Workers Scripts: Edit Â· Notifications: Edit |
 
-Under *Zone Resources* pick your domain, then *Continue to summary* → *Create Token* and copy the token (it is shown once). The account also needs the **Load Balancing** add-on.
+Under *Zone Resources* pick your domain, then *Continue to summary* â†’ *Create Token* and copy the token (it is shown once). The account also needs the **Load Balancing** add-on.
 
-**MongoDB Atlas API key** — Atlas → organisation menu (top left) → **Access Manager** → *Applications* → **API Keys** → *Create API Key*:
+**MongoDB Atlas API key** â€” Atlas â†’ organisation menu (top left) â†’ **Access Manager** â†’ *Applications* â†’ **API Keys** â†’ *Create API Key*:
 
-1. Description `terraform`, organisation permission *Organization Member* → *Next*.
+1. Description `terraform`, organisation permission *Organization Member* â†’ *Next*.
 2. Copy the **public key** and the **private key** (the private key is shown once).
-3. *Add Access List Entry* → **Use Current IP Address** → *Save* — the key only works from listed IPs.
-4. Open the project → *Project Identity & Access* → *Applications* → *Add Existing Key* → this key → role **Project Owner** (it creates database users and the IP access list).
+3. *Add Access List Entry* â†’ **Use Current IP Address** â†’ *Save* â€” the key only works from listed IPs.
+4. Open the project â†’ *Project Identity & Access* â†’ *Applications* â†’ *Add Existing Key* â†’ this key â†’ role **Project Owner** (it creates database users and the IP access list).
 
 ### 4. Your IP and the keys for this session
 
@@ -184,21 +184,21 @@ read -rsp "Atlas private key: " MONGODB_ATLAS_PRIVATE_KEY; echo; export MONGODB_
 
 Input is hidden and the values live only in this terminal's memory. If your IP changes later, repeat this step and add the new IP to the Atlas key's access list.
 
-### 5. Start everything — all three clouds in parallel
+### 5. Start everything â€” all three clouds in parallel
 
 ```bash
 time ansible-playbook playbooks/up.yml -e keep_awake=true
 ```
 
-Preflight (tools, logins, IP) → image mirrors → **GKE, AKS and EKS created at the same time** → global layer (DNS, load balancer, Atlas allow-list, secrets in all vaults) → per cloud: add-ons → the shop (6 services at once) → health check. Without `-e keep_awake=true` the standbys go to sleep at the end automatically.
+Preflight (tools, logins, IP) â†’ image mirrors â†’ **GKE, AKS and EKS created at the same time** â†’ global layer (DNS, load balancer, Atlas allow-list, secrets in all vaults) â†’ per cloud: add-ons â†’ the shop (6 services at once) â†’ health check. Without `-e keep_awake=true` the standbys go to sleep at the end automatically.
 
 ```bash
 for c in gcp azure aws; do curl -s https://$c.rishavmukhopadhyay.store/api/health; echo; done   # "status":"ok" x3
 ```
 
-Open `https://rishavmukhopadhyay.store`, `https://jenkins.…` and `https://grafana.…` (Cloudflare e-mails a PIN; admin passwords: `terraform output -raw jenkins_admin_password` / `grafana_admin_password` in `gcp-platform/environments/prod/addons`).
+Open `https://rishavmukhopadhyay.store`, `https://jenkins.â€¦` and `https://grafana.â€¦` (Cloudflare e-mails a PIN; admin passwords: `terraform output -raw jenkins_admin_password` / `grafana_admin_password` in `gcp-platform/environments/prod/addons`).
 
-### 6. Put AWS and Azure to sleep — GCP serves everyone
+### 6. Put AWS and Azure to sleep â€” GCP serves everyone
 
 ```bash
 ansible-playbook playbooks/standby.yml
@@ -207,9 +207,9 @@ aws eks describe-nodegroup --cluster-name prod-eks --nodegroup-name default --re
   --query nodegroup.scalingConfig.desiredSize --profile HeroviredProfile                     # 0
 ```
 
-The standbys keep their cluster, add-ons, shop, DNS and load-balancer pool — only the machines stop, like a stopped EC2 instance. EKS can take a while to drain its last pods; finish it at once with `kubectl --context arn:aws:eks:ap-south-1:722867460821:cluster/prod-eks drain -l eks.amazonaws.com/nodegroup=default --disable-eviction --force --ignore-daemonsets --delete-emptydir-data`.
+The standbys keep their cluster, add-ons, shop, DNS and load-balancer pool â€” only the machines stop, like a stopped EC2 instance. EKS can take a while to drain its last pods; finish it at once with `kubectl --context arn:aws:eks:ap-south-1:722867460821:cluster/prod-eks drain -l eks.amazonaws.com/nodegroup=default --disable-eviction --force --ignore-daemonsets --delete-emptydir-data`.
 
-### 7. Force GCP down — the standbys wake up by themselves
+### 7. Force GCP down â€” the standbys wake up by themselves
 
 ```bash
 time ansible-playbook playbooks/drill-failover.yml                    # automatic wake-up
@@ -218,15 +218,15 @@ time ansible-playbook playbooks/drill-failover.yml                    # automati
 
 What happens, with nobody touching anything:
 
-1. GCP's front door is closed (`api-gateway-service` scaled to 0) — the shop is down, both standbys asleep.
+1. GCP's front door is closed (`api-gateway-service` scaled to 0) â€” the shop is down, both standbys asleep.
 2. Cloudflare's health check fails within seconds and its notification calls the **Worker `mern-failover`**.
-3. The Worker starts the GitHub workflow **`failover-wake`**, which logs in **without keys** using identities that may only *start AKS* and *resize the EKS node group* — Azure and AWS wake up in parallel.
-4. The first standby that answers `/api/health` takes the traffic; the shop is back. Watch it in Cloudflare → Load Balancing and in GitHub → `platform-automation` → Actions.
+3. The Worker starts the GitHub workflow **`failover-wake`**, which logs in **without keys** using identities that may only *start AKS* and *resize the EKS node group* â€” Azure and AWS wake up in parallel.
+4. The first standby that answers `/api/health` takes the traffic; the shop is back. Watch it in Cloudflare â†’ Load Balancing and in GitHub â†’ `platform-automation` â†’ Actions.
 5. GCP is repaired, the standbys go back to sleep, and the playbook prints the **RTO** (measured: **3 min 42 s**).
 
 Manual version of step 1: `kubectl --context gke_project-899ced78-a554-40c2-96c_asia-south1-a_prod-gke -n mern scale deploy api-gateway-service --replicas=0` (undo with `--replicas=2`).
 
-If AKS was still starting when the drill tried to stop it again, wait until `az aks show … --query provisioningState` says `Succeeded`, then run `ansible-playbook playbooks/standby.yml`.
+If AKS was still starting when the drill tried to stop it again, wait until `az aks show â€¦ --query provisioningState` says `Succeeded`, then run `ansible-playbook playbooks/standby.yml`.
 
 ### 8. Tear everything down
 
@@ -234,21 +234,21 @@ If AKS was still starting when the drill tried to stop it again, wait until `az 
 time ansible-playbook playbooks/down.yml
 ```
 
-Wakes the standbys (so Kubernetes can remove its own load balancers and disks) → per cloud: add-ons destroyed → state must be empty → **leftover check** (stops if a load balancer or disk would be orphaned) → cluster destroyed → global layer (delete only). Only the permanent foundation (registries, vaults, backups, state) remains. Check:
+Wakes the standbys (so Kubernetes can remove its own load balancers and disks) â†’ per cloud: add-ons destroyed â†’ state must be empty â†’ **leftover check** (stops if a load balancer or disk would be orphaned) â†’ cluster destroyed â†’ global layer (delete only). Only the permanent foundation (registries, vaults, backups, state) remains. Check:
 
 ```bash
 gcloud container clusters list; az aks list -o table
 aws eks list-clusters --region ap-south-1 --profile HeroviredProfile
 ```
 
-Other playbooks: `wake.yml -e cloud=azure` (wake one standby) · `deploy.yml -e service=… -e tag=…` (deploy without Jenkins) · `drill-restore.yml` (restore the backups from all three clouds). Details: [operations runbook](https://github.com/ppmcad16a-cloud-platform/core-cloud-platform/blob/main/docs/05-operations-runbook.md).
+Other playbooks: `wake.yml -e cloud=azure` (wake one standby) Â· `deploy.yml -e service=â€¦ -e tag=â€¦` (deploy without Jenkins) Â· `drill-restore.yml` (restore the backups from all three clouds). Details: [operations runbook](https://github.com/ppmcad16a-cloud-platform/core-cloud-platform/blob/main/docs/05-operations-runbook.md).
 
-## Results of the final test (30–31 Oct 2026)
+## Results of the final test (30â€“31 Oct 2026)
 
 | Test | Result |
 |---|---|
 | Session start, 3 clusters in parallel (`up.yml`) | all clouds green, 23 min 13 s |
-| One merge → CI → same image in 3 registries → Jenkins → 3 clouds | live everywhere in 4 min 57 s |
+| One merge â†’ CI â†’ same image in 3 registries â†’ Jenkins â†’ 3 clouds | live everywhere in 4 min 57 s |
 | Backup to GCS + S3 + Azure Blob, restore drill from each | 3/3 passed |
-| Automatic failover (GCP down → standbys woken by Cloudflare → GitHub Actions) | RTO 3 min 42 s (target 20 min) |
-| Cost for October (three clouds, session-based) | ≈ US $17 |
+| Automatic failover (GCP down â†’ standbys woken by Cloudflare â†’ GitHub Actions) | RTO 3 min 42 s (target 20 min) |
+| Cost for October (three clouds, session-based) | â‰ˆ US $17 |
